@@ -126,6 +126,6 @@ def get_reco(request):
    
    # Si user_id n'est pas fourni
    else:
-       result = {'user_id': '', 'reco_cats': '[]', 'reco_arts': '[]'}
+       result = {'user_id': '', 'reco_cats': '[]', 'reco_arts': '[]', 't_start': 0, 't_load': 0, 't_pred': 0}
 
    return result
