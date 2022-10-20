@@ -1,5 +1,4 @@
 import os
-import json
 import time
 import pickle
 import numpy as np
@@ -92,7 +91,7 @@ def get_recommendations(user_id, top_n_cat, cat_by_user, art_by_user, art_df):
         pop_art = pop_art.groupby('article_id').count().reset_index().sort_values(by='user_id', ascending=False)
         selected_art.append(int(pop_art.head(1)['article_id'].values))
     
-    return list(set(selected_cat)), selected_art
+    return ",".join([str(c) for c in list(set(selected_cat))]), ",".join([str(a) for a in selected_art])
 
 
 @functions_framework.http
@@ -122,8 +121,7 @@ def get_reco(request):
        top_n_cat = get_top_n_cat(user_pred)
        cats, arts = get_recommendations(2, top_n_cat, cat_by_user, art_by_user, art_df)
        t_pred = time.time()
-       result = {'user_id': user_id, 'reco_cats': json.dumps(cats), 'reco_arts': json.dumps(arts),
-            't_start': t_start, 't_load': t_load, 't_pred': t_pred}
+       result = {'user_id': user_id, 'reco_cats': cats, 'reco_arts': arts, 't_start': t_start, 't_load': t_load, 't_pred': t_pred}
    
    # Si user_id n'est pas fourni
    else:
