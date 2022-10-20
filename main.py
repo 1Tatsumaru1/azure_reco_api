@@ -102,9 +102,9 @@ def get_reco(request):
        @return <JSON> {user_id, reco_cats, reco_arts, t_start, t_load, t_pred}
    """
    # Récupération du user_id
-   request_args = request.args
-   if request_args and 'user_id' in request_args:
-       user_id = request_args['user_id']
+   request_json = request.json
+   if request_json and 'user_id' in request_json:
+       user_id = request_json['user_id']
 
        # Chargement des fichier depuis le bucket du projet
        t_start = time.time()
