@@ -1,0 +1,32 @@
+name: Reco API CI
+run-name: ${{ github.actor }}
+on: [push]
+jobs:
+  job_id:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - id: auth
+      uses: google-github-actions/auth@v0
+      with:
+        credentials_json: 'C:\Users\aledo\p9\reco-api\projet9-365310-fe2c92d2c12c.json'
+
+    - id: 'deploy'
+      uses: 'google-github-actions/deploy-cloud-functions@v0'
+      with:
+        name: 'reco-api'
+        runtime: 'python39'
+        entry_point: 'get_reco'
+        memory_mb: '2048'
+        region: 'europe-west6'
+        timeout: '300'
+        max_instances: '4'
+
+    # Example of using the output
+    - id: 'test'
+      run: 'curl "${{ steps.deploy.outputs.url }}"'
