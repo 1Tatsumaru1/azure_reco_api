@@ -20,6 +20,7 @@ jobs:
       uses: 'google-github-actions/deploy-cloud-functions@v0'
       with:
         name: 'reco-api'
+        project_id: 'projet9-365310'
         runtime: 'python39'
         entry_point: 'get_reco'
         memory_mb: '2048'
