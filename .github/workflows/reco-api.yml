@@ -27,6 +27,5 @@ jobs:
         region: 'europe-west6'
         timeout: '300'
         max_instances: '4'
-        event_trigger_type: 'http'
         https_trigger_security_level: 'secure_always'
 
