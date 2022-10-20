@@ -7,6 +7,7 @@ import pandas as pd
 import functions_framework
 from surprise import SVD
 from google.cloud import storage
+from collections import defaultdict
 
 
 storage_client = storage.Client()
@@ -104,7 +105,7 @@ def get_reco(request):
    # Récupération du user_id
    request_json = request.json
    if request_json and 'user_id' in request_json:
-       user_id = request_json['user_id']
+       user_id = int(request_json['user_id'])
 
        # Chargement des fichier depuis le bucket du projet
        t_start = time.time()
