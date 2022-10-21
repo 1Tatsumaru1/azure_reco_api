@@ -65,6 +65,6 @@ jobs:
           app-name: 'reco-api'
           slot-name: 'Production'
           package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_5504BAFDD68C476B97184667AE4681C0 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_236421DD471844B7AAFF861A41AA7C4D }}
           scm-do-build-during-deployment: true
           enable-oryx-build: true
