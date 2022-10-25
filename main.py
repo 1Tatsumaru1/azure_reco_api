@@ -47,7 +47,7 @@ def get_top_n_art(predictions, deja_lus, n=5):
     return top_n
 
 
-def make_recommendation(model, user_id, art_by_user, art_df, n=5):
+def get_recommendations(model, user_id, art_by_user, art_df, n=5):
     """
     Renvoi un dataframe des articles les plus recommandés pour tous les utilisateur
         @param model <Surprise.SVD> : model entraîné servant à la prédiction
