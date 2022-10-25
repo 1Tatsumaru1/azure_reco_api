@@ -25,17 +25,19 @@ def get_resource(name, type):
 
 
 # Source : https://github.com/NicolasHug/Surprise/blob/master/examples/top_n_recommendations.py
-def get_top_n_cat(predictions, n=10):
+def get_top_n_art(predictions, deja_lus, n=5):
     """
-    Renvoi les n catégories les plus recommandées pour chaque utilisateur
+    Renvoi les n articles les plus recommandées pour chaque utilisateur parmis ceux non lus
         @param predictions <Surprise Prediction> : prédictions issues de la méthode "test" d'un modèle Surprise
+        @param deja_lus <list> : liste des articles déjà lus par l'utilisateur
         @param n <int> : nombre de recommandations à émettre
         @return <dict> : dictionnaire {user_id: [(category_id, predicted_rating), ...]}
     """
     # Map the predictions to each user
     top_n = defaultdict(list)
     for uid, iid, true_r, est, _ in predictions:
-        top_n[uid].append((iid, est))
+        if iid not in deja_lus:
+            top_n[uid].append((iid, est))
 
     # Sort the predictions for each user and retrieve the k highest ones
     for uid, user_ratings in top_n.items():
@@ -45,53 +47,42 @@ def get_top_n_cat(predictions, n=10):
     return top_n
 
 
-def get_recommendations(user_id, top_n_cat, cat_by_user, art_by_user, art_df):
+def make_recommendation(model, user_id, art_by_user, art_df, n=5):
     """
-    Renvoi une liste de 5 articles recommandés pour un utilisateur
-        @param user_id <int> : ID de l'utilisateur pour lequel émettre des recommandations
-        @param top_n_cat <list(int)> : top N catégories (avec poids associés) recommandées pour l'utilisateur
-        @param cat_by_user <Panda.Dataframe> : Dataframe utilisé pour la recommandation si top_n_cat est vide
-        @param art_by_user <Panda.Dataframe> : Dataframe des articles déjà lus et à ne pas reproposer
-        @param articles_df <Panda.Dataframe> : Dataframe des articles par catégorie pour piocher les suggestions
-        @return <list>, <list> : [articles recommandés], [catégories recommandées]
+    Renvoi un dataframe des articles les plus recommandés pour tous les utilisateur
+        @param model <Surprise.SVD> : model entraîné servant à la prédiction
+        @param user_id <int> : utilisateur pour qui effectuer la prédiction
+        @param art_by_user <Pandas.DataFrame> : dataframe des interactions utilisateur/article
+        @param art_df <Pandas.DataFrame> : dataframe listant les articles et leur catégorie
+        @param n <int> : nombre d'articles à renvoyer (défaut : 5)
+        @return <Pandas.DataFrame> : user_id, reco_art, reco_cat
     """
+    # Constuction du dataset de prédiction
+    article_list = art_by_user['article_id'].unique()
+    nb_art = len(article_list)
+    value_fill = np.full((nb_art,), 0)
+    user_fill = np.full((nb_art,), user_id)
+    art_rating = pd.DataFrame({
+        'user_id': user_fill,
+        'article_id': article_list,
+        'value': value_fill
+    })
 
-    # Recherche des catégories recommandées pour l'utilisateur spécifié
-    recommanded_cat = [cat for cat, _ in top_n_cat[user_id]]
-    recommanded_wei = [wei for _, wei in top_n_cat[user_id]]
-    
-    # S'il n'y a pas de recommandation, nous utilisons les catégories historiques de l'utilisateur
-    if not recommanded_cat:
-        nb_cat = len(cat_by_user[cat_by_user['user_id'] == user_id])
-        sorted_cats = cat_by_user[cat_by_user['user_id'] == user_id].nlargest(nb_cat, ['nb_clicks'])
-        recommanded_cat = sorted_cats['category_id'].values
-        recommanded_wei = sorted_cats['nb_clicks'].values
-    
-    # Soustraction des articles déjà lus par l'utilisateur
-    deja_lu = art_by_user[art_by_user['user_id'] == user_id]['article_id'].values
-    possible_art = art_df[~art_df['article_id'].isin(deja_lu)]
-    
-    # Selection des catégories à représenter en tenant compte des pondérations
-    relative_wei = np.rint(np.divide(recommanded_wei, recommanded_wei[-1]))
-    selected_cat = []
-    for i in range(min(5, len(recommanded_cat))):
-        selected_cat = np.concatenate((selected_cat, np.repeat(recommanded_cat[i], recommanded_wei[i])), axis=None)
-    selected_cat = selected_cat.astype(int)[:min(5, len(selected_cat))]
-    while len(selected_cat) < 5:
-        selected_cat = np.concatenate(
-            (selected_cat, selected_cat[0: min(len(selected_cat), 5 - len(selected_cat))]), axis=None)
-    
-    # Sélection des 5 articles non lus les plus populaires parmis les catégories recommandées avec pondération
-    selected_art = []
-    for c in selected_cat:
-        pop_art = art_by_user[['user_id', 'article_id']].join(
-            possible_art[['article_id', 'category_id']].set_index('article_id'), how='left', on='article_id')
-        pop_art = pop_art.loc[
-            (pop_art['category_id'] == c) & (~pop_art['article_id'].isin(selected_art)), ['article_id', 'user_id']]
-        pop_art = pop_art.groupby('article_id').count().reset_index().sort_values(by='user_id', ascending=False)
-        selected_art.append(int(pop_art.head(1)['article_id'].values))
-    
-    return ",".join([str(c) for c in list(set(selected_cat))]), ",".join([str(a) for a in selected_art])
+    # Identifiation des articles lus
+    user_art_list = art_by_user[art_by_user['user_id'] == user_id]['article_id'].values
+    art_rating.loc[art_rating['article_id'].isin(user_art_list), 'value'] = 1
+
+    # Récupération de la prédiction
+    pred = model.test(art_rating.to_numpy())
+    top_n = get_top_n_art(pred, user_art_list)
+
+    # Préparation des données retournées
+    pred_arts = [art for art, _ in top_n[user_id]]
+    pred_cats = list(set(art_df[art_df['article_id'].isin(pred_arts)]['category_id'].values))
+    cats = ", ".join([str(c) for c in list(set(pred_cats))])
+    arts = ",".join([str(a) for a in pred_arts])
+
+    return cats, arts
 
 
 @functions_framework.http
@@ -108,18 +99,13 @@ def get_reco(request):
 
        # Chargement des fichier depuis le bucket du projet
        t_start = time.time()
-       model = get_resource('svd.pkl', 'pkl')
-       cat_by_user = get_resource('cat_rating_by_user.csv', 'csv')
+       model = get_resource('svd_art.pkl', 'pkl')
        art_by_user = get_resource('articles_by_user.csv', 'csv')
        art_df = get_resource('articles_metadata.csv', 'csv')
        t_load = time.time()
 
        # Calcul des recommandations
-       user_spec = cat_by_user[cat_by_user['user_id'] == user_id]
-       user_pred = model.test(user_spec.to_numpy())
-       top_n = get_top_n_cat(user_pred, 5)
-       top_n_cat = get_top_n_cat(user_pred)
-       cats, arts = get_recommendations(2, top_n_cat, cat_by_user, art_by_user, art_df)
+       cats, arts = get_recommendations(model, user_id, art_by_user, art_df)
        t_pred = time.time()
        result = {'user_id': user_id, 'reco_cats': cats, 'reco_arts': arts, 't_start': t_start, 't_load': t_load, 't_pred': t_pred}
    
