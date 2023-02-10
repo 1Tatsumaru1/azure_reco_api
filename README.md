@@ -49,4 +49,4 @@ This project makes use of the following open source packages:
 
 > [anthony.ledouguet.com](https://anthony.ledouguet.com) &nbsp;&middot;&nbsp;
 > [GitHub](https://github.com/1Tatsumaru1) &nbsp;&middot;&nbsp;
-> [@LinkedIn](https://www.linkedin.com/in/anthony-le-douguet/)
+> [LinkedIn](https://www.linkedin.com/in/anthony-le-douguet/)
