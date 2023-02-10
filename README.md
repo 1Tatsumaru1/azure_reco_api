@@ -47,6 +47,9 @@ This project makes use of the following open source packages:
 
 ## Links
 
-> [anthony.ledouguet.com](https://anthony.ledouguet.com) &nbsp;&middot;&nbsp;
-> [GitHub](https://github.com/1Tatsumaru1) &nbsp;&middot;&nbsp;
-> [LinkedIn](https://www.linkedin.com/in/anthony-le-douguet/)
+<img src="https://github.com/1Tatsumaru1/azure_reco_api/blob/main/img/world.png" alt="website" width="20px" />
+[anthony.ledouguet.com](https://anthony.ledouguet.com)<br>
+<img src="https://github.com/1Tatsumaru1/azure_reco_api/blob/main/img/github.png" alt="github" width="20px" />
+[GitHub](https://github.com/1Tatsumaru1)<br>
+<img src="https://github.com/1Tatsumaru1/azure_reco_api/blob/main/img/linkedin.png" alt="linkedin" width="20px" />
+[LinkedIn](https://www.linkedin.com/in/anthony-le-douguet/)
