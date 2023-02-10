@@ -1,7 +1,7 @@
 <h1 align="center">
   <br>
-  <a href="http://www.amitmerchant.com/electron-markdownify">
-    <img src="https://azure.microsoft.com/svghandler/functions/?width=600&height=315" alt="Markdownify" width="200">
+  <a href="https://portal.azure.com">
+    <img src="https://azure.microsoft.com/svghandler/functions/?width=600&height=315" alt="Azure Function" width="200">
   </a>
   <br>
   Recommendation API for Azure Functions
