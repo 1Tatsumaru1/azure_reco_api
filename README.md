@@ -48,8 +48,8 @@ This project makes use of the following open source packages:
 ## Links
 
 > <img src="https://github.com/1Tatsumaru1/azure_reco_api/blob/main/img/world.png" alt="website" width="20" />
-[anthony.ledouguet.com](https://anthony.ledouguet.com)<br>
+> [anthony.ledouguet.com](https://anthony.ledouguet.com)<br>
 > <img src="https://github.com/1Tatsumaru1/azure_reco_api/blob/main/img/github.png" alt="github" width="20" />
-[GitHub](https://github.com/1Tatsumaru1)<br>
+> [GitHub](https://github.com/1Tatsumaru1)<br>
 > <img src="https://github.com/1Tatsumaru1/azure_reco_api/blob/main/img/linkedin.png" alt="linkedin" width="20" />
-[LinkedIn](https://www.linkedin.com/in/anthony-le-douguet/)
+> [LinkedIn](https://www.linkedin.com/in/anthony-le-douguet/)
